@@ -1,45 +1,3 @@
-// --------------------------------------------------------------------
-// Copyright (c) 2008 by Terasic Technologies Inc. 
-// --------------------------------------------------------------------
-//
-// Permission:
-//
-//   Terasic grants permission to use and modify this code for use
-//   in synthesis for all Terasic Development Boards and Altera Development 
-//   Kits made by Terasic.  Other use of this code, including the selling 
-//   ,duplication, or modification of any portion is strictly prohibited.
-//
-// Disclaimer:
-//
-//   This VHDL/Verilog or C/C++ source code is intended as a design reference
-//   which illustrates how these types of functions can be implemented.
-//   It is the user's responsibility to verify their design for
-//   consistency and functionality through the use of formal
-//   verification methods.  Terasic provides no warranty regarding the use 
-//   or functionality of this code.
-//
-// --------------------------------------------------------------------
-//           
-//                     Terasic Technologies Inc
-//                     356 Fu-Shin E. Rd Sec. 1. JhuBei City,
-//                     HsinChu County, Taiwan
-//                     302
-//
-//                     web: http://www.terasic.com/
-//                     email: support@terasic.com
-//
-// --------------------------------------------------------------------
-//
-// Major Functions:	 CCD_Capture
-// 
-// --------------------------------------------------------------------
-//
-// Revision History :
-// --------------------------------------------------------------------
-//   Ver  :| Author            		:| Mod. Date :| Changes Made:
-//   V1.0 :| Johnny Fan				:| 08/04/16  :| Initial Revision
-// --------------------------------------------------------------------
-
 module CCD_Capture(	oDATA,
 					oDVAL,
 					oX_Cont,
@@ -51,31 +9,28 @@ module CCD_Capture(	oDATA,
 					iSTART,
 					iEND,
 					iCLK,
-					iRST
-						);
+					iRST	);
 					
-input	[11:0]	iDATA;
+input	[9:0]	iDATA;
 input			iFVAL;
 input			iLVAL;
 input			iSTART;
 input			iEND;
 input			iCLK;
 input			iRST;
-output	[11:0]	oDATA;
-output	[15:0]	oX_Cont;
-output	[15:0]	oY_Cont;
+output	[9:0]	oDATA;
+output	[10:0]	oX_Cont;
+output	[10:0]	oY_Cont;
 output	[31:0]	oFrame_Cont;
 output			oDVAL;
 reg				Pre_FVAL;
 reg				mCCD_FVAL;
 reg				mCCD_LVAL;
-reg		[11:0]	mCCD_DATA;
-reg		[15:0]	X_Cont;
-reg		[15:0]	Y_Cont;
+reg		[9:0]	mCCD_DATA;
+reg		[10:0]	X_Cont;
+reg		[10:0]	Y_Cont;
 reg		[31:0]	Frame_Cont;
 reg				mSTART;
-
-parameter COLUMN_WIDTH = 800;
 
 assign	oX_Cont		=	X_Cont;
 assign	oY_Cont		=	Y_Cont;
@@ -103,6 +58,7 @@ begin
 		Pre_FVAL	<=	0;
 		mCCD_FVAL	<=	0;
 		mCCD_LVAL	<=	0;
+		mCCD_DATA	<=	0;
 		X_Cont		<=	0;
 		Y_Cont		<=	0;
 	end
@@ -114,11 +70,12 @@ begin
 		else if({Pre_FVAL,iFVAL}==2'b10)
 		mCCD_FVAL	<=	0;
 		mCCD_LVAL	<=	iLVAL;
+		mCCD_DATA	<=	iDATA;
 		if(mCCD_FVAL)
 		begin
 			if(mCCD_LVAL)
 			begin
-				if(X_Cont<(COLUMN_WIDTH-1))
+				if(X_Cont<1279)
 				X_Cont	<=	X_Cont+1;
 				else
 				begin
@@ -145,39 +102,5 @@ begin
 		Frame_Cont	<=	Frame_Cont+1;
 	end
 end
-
-always@(posedge iCLK or negedge iRST)
-begin
-	if(!iRST)
-		mCCD_DATA	<=	0;
-	else if (iLVAL)
-		mCCD_DATA	<=	iDATA;
-	else
-		mCCD_DATA	<=	0;	
-end			
-
-reg	ifval_dealy;
-wire ifval_fedge;	
-reg	[15:0]	y_cnt_d;
-
-
-always@(posedge iCLK or negedge iRST)
-begin
-	if(!iRST)
-		y_cnt_d	<=	0;
-	else
-		y_cnt_d	<=	Y_Cont;	
-end
-
-
-always@(posedge iCLK or negedge iRST)
-begin
-	if(!iRST)
-		ifval_dealy	<=	0;
-	else
-		ifval_dealy	<=	iFVAL;	
-end
-
-assign ifval_fedge = ({ifval_dealy,iFVAL}==2'b10)?1:0;  
 
 endmodule

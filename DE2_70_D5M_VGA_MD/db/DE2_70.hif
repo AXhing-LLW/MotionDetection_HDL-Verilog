@@ -3775,6 +3775,9 @@ clkena
 -1
 2
 }
+# hierarchies {
+sdram_pll:sdram_pll0|altpll:altpll_component
+}
 # macro_sequence
 
 # end
@@ -9019,64 +9022,6 @@ I2C_AV_Config:u8
 
 # end
 # entity
-I2C_CCD_Config
-# storage
-db|DE2_70.(40).cnf
-db|DE2_70.(40).cnf
-# logic_option {
-AUTO_RAM_RECOGNITION
-ON
-}
-# case_sensitive
-# source_file
-hardware|i2c_ccd_config.v
-a01bbf1e12cd1923e9f27652b0818e
-8
-# internal_option {
-HDL_INITIAL_FANOUT_LIMIT
-OFF
-AUTO_RESOURCE_SHARING
-OFF
-AUTO_RAM_RECOGNITION
-ON
-AUTO_ROM_RECOGNITION
-ON
-IGNORE_VERILOG_INITIAL_CONSTRUCTS
-OFF
-VERILOG_CONSTANT_LOOP_LIMIT
-5000
-VERILOG_NON_CONSTANT_LOOP_LIMIT
-250
-}
-# user_parameter {
-default_exposure
-0000010100000000
-PARAMETER_UNSIGNED_BIN
-DEF
-exposure_change_value
-0000000000011110
-PARAMETER_UNSIGNED_BIN
-DEF
-CLK_Freq
-50000000
-PARAMETER_SIGNED_DEC
-DEF
-I2C_Freq
-20000
-PARAMETER_SIGNED_DEC
-DEF
-LUT_SIZE
-25
-PARAMETER_SIGNED_DEC
-DEF
-}
-# hierarchies {
-I2C_CCD_Config:ccd_config0
-}
-# macro_sequence
-
-# end
-# entity
 Reset_Delay
 # storage
 db|DE2_70.(1).cnf
@@ -9108,48 +9053,6 @@ VERILOG_NON_CONSTANT_LOOP_LIMIT
 }
 # hierarchies {
 Reset_Delay:reset0
-}
-# macro_sequence
-
-# end
-# entity
-CCD_Capture
-# storage
-db|DE2_70.(2).cnf
-db|DE2_70.(2).cnf
-# logic_option {
-AUTO_RAM_RECOGNITION
-ON
-}
-# case_sensitive
-# source_file
-hardware|ccd_capture.v
-2432a8a2947ccf2d3cf0bbff3657464
-8
-# internal_option {
-HDL_INITIAL_FANOUT_LIMIT
-OFF
-AUTO_RESOURCE_SHARING
-OFF
-AUTO_RAM_RECOGNITION
-ON
-AUTO_ROM_RECOGNITION
-ON
-IGNORE_VERILOG_INITIAL_CONSTRUCTS
-OFF
-VERILOG_CONSTANT_LOOP_LIMIT
-5000
-VERILOG_NON_CONSTANT_LOOP_LIMIT
-250
-}
-# user_parameter {
-COLUMN_WIDTH
-800
-PARAMETER_SIGNED_DEC
-DEF
-}
-# hierarchies {
-CCD_Capture:capture0
 }
 # macro_sequence
 
@@ -9302,44 +9205,8 @@ VERILOG_NON_CONSTANT_LOOP_LIMIT
 250
 }
 # hierarchies {
-I2C_CCD_Config:ccd_config0|I2C_Controller:u0
+I2C_CCD_Config:u7|I2C_Controller:u0
 I2C_AV_Config:u8|I2C_Controller:u0
-}
-# macro_sequence
-
-# end
-# entity
-DE2_70
-# storage
-db|DE2_70.(0).cnf
-db|DE2_70.(0).cnf
-# logic_option {
-AUTO_RAM_RECOGNITION
-ON
-}
-# case_sensitive
-# source_file
-hardware|de2_70.v
-9d29f6593ea3e677c88802b129f2c1e
-8
-# internal_option {
-HDL_INITIAL_FANOUT_LIMIT
-OFF
-AUTO_RESOURCE_SHARING
-OFF
-AUTO_RAM_RECOGNITION
-ON
-AUTO_ROM_RECOGNITION
-ON
-IGNORE_VERILOG_INITIAL_CONSTRUCTS
-OFF
-VERILOG_CONSTANT_LOOP_LIMIT
-5000
-VERILOG_NON_CONSTANT_LOOP_LIMIT
-250
-}
-# hierarchies {
-|
 }
 # macro_sequence
 
@@ -9412,6 +9279,164 @@ VERILOG_NON_CONSTANT_LOOP_LIMIT
 }
 # hierarchies {
 RAW2RGB:u4
+}
+# macro_sequence
+
+# end
+# entity
+I2C_CCD_Config
+# storage
+db|DE2_70.(40).cnf
+db|DE2_70.(40).cnf
+# logic_option {
+AUTO_RAM_RECOGNITION
+ON
+}
+# case_sensitive
+# source_file
+hardware|i2c_ccd_config.v
+5930c885c59226dcbd6e9916ba549d
+8
+# internal_option {
+HDL_INITIAL_FANOUT_LIMIT
+OFF
+AUTO_RESOURCE_SHARING
+OFF
+AUTO_RAM_RECOGNITION
+ON
+AUTO_ROM_RECOGNITION
+ON
+IGNORE_VERILOG_INITIAL_CONSTRUCTS
+OFF
+VERILOG_CONSTANT_LOOP_LIMIT
+5000
+VERILOG_NON_CONSTANT_LOOP_LIMIT
+250
+}
+# user_parameter {
+CLK_Freq
+50000000
+PARAMETER_SIGNED_DEC
+DEF
+I2C_Freq
+20000
+PARAMETER_SIGNED_DEC
+DEF
+LUT_SIZE
+17
+PARAMETER_SIGNED_DEC
+DEF
+}
+# hierarchies {
+I2C_CCD_Config:u7
+}
+# macro_sequence
+
+# end
+# entity
+CCD_Capture
+# storage
+db|DE2_70.(2).cnf
+db|DE2_70.(2).cnf
+# logic_option {
+AUTO_RAM_RECOGNITION
+ON
+}
+# case_sensitive
+# source_file
+hardware|ccd_capture.v
+5fb629c046d762e5a0b1b98161b8351f
+8
+# internal_option {
+HDL_INITIAL_FANOUT_LIMIT
+OFF
+AUTO_RESOURCE_SHARING
+OFF
+AUTO_RAM_RECOGNITION
+ON
+AUTO_ROM_RECOGNITION
+ON
+IGNORE_VERILOG_INITIAL_CONSTRUCTS
+OFF
+VERILOG_CONSTANT_LOOP_LIMIT
+5000
+VERILOG_NON_CONSTANT_LOOP_LIMIT
+250
+}
+# hierarchies {
+CCD_Capture:u3
+}
+# macro_sequence
+
+# end
+# entity
+sdram_pll
+# storage
+db|DE2_70.(60).cnf
+db|DE2_70.(60).cnf
+# logic_option {
+AUTO_RAM_RECOGNITION
+ON
+}
+# case_sensitive
+# source_file
+hardware|sdram_pll.v
+22c8691beed92a1c3caead2c326d6e5
+8
+# internal_option {
+HDL_INITIAL_FANOUT_LIMIT
+OFF
+AUTO_RESOURCE_SHARING
+OFF
+AUTO_RAM_RECOGNITION
+ON
+AUTO_ROM_RECOGNITION
+ON
+IGNORE_VERILOG_INITIAL_CONSTRUCTS
+OFF
+VERILOG_CONSTANT_LOOP_LIMIT
+5000
+VERILOG_NON_CONSTANT_LOOP_LIMIT
+250
+}
+# hierarchies {
+sdram_pll:sdram_pll0
+}
+# macro_sequence
+
+# end
+# entity
+DE2_70
+# storage
+db|DE2_70.(0).cnf
+db|DE2_70.(0).cnf
+# logic_option {
+AUTO_RAM_RECOGNITION
+ON
+}
+# case_sensitive
+# source_file
+hardware|de2_70.v
+cbe3e99bd0f9bd6eacdda5d859dd5038
+8
+# internal_option {
+HDL_INITIAL_FANOUT_LIMIT
+OFF
+AUTO_RESOURCE_SHARING
+OFF
+AUTO_RAM_RECOGNITION
+ON
+AUTO_ROM_RECOGNITION
+ON
+IGNORE_VERILOG_INITIAL_CONSTRUCTS
+OFF
+VERILOG_CONSTANT_LOOP_LIMIT
+5000
+VERILOG_NON_CONSTANT_LOOP_LIMIT
+250
+}
+# hierarchies {
+|
 }
 # macro_sequence
 

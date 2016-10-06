@@ -170,39 +170,57 @@ module DE2_70 (
   inout          GPIO_CLKOUT_P1     // GPIO Connection 1 Clock Output 1
 );
  
+ assign    oLCD_ON        =    1'b1;
+ assign    oLCD_BLON    =    1'b1;
+ assign    oTD1_RESET_N    =    1'b1;
+ assign    oAUD_XCK        =    AUD_CTRL_CLK;
+ 
+  //    All inout port turn to tri-state
+ assign    FLASH_DQ        =    8'hzz;
+ assign    SRAM_DQ        =    16'hzzzz;
+ assign    OTG_D    =    16'hzzzz;
+ assign    LCD_D    =    8'hzz;
+ assign    SD_DAT        =    1'bz;
+ assign    ENET_D    =    16'hzzzz;
+ 
 //  CCD
-wire  [11:0]  CCD_DATA;
+wire  [9:0]  CCD_DATA;
 wire          CCD_SDAT;
 wire          CCD_SCLK;
 wire          CCD_FLASH;
 wire          CCD_FVAL;
 wire          CCD_LVAL;
 wire          CCD_PIXCLK;
-wire          CCD_MCLK; //  CCD Master Clock
+reg          CCD_MCLK; //  CCD Master Clock
+
 
 wire  [15:0]  Read_DATA1;
 wire  [15:0]  Read_DATA2;
 wire  [15:0]  Read_DATA3; // add by oomusou for RGB16
 wire  [15:0]  Read_DATA4; // add by oomusou for RGB16
 wire          VGA_CTRL_CLK;
-wire  [11:0]  mCCD_DATA;
+ wire            AUD_CTRL_CLK;
+wire  [9:0]  mCCD_DATA;
 wire          mCCD_DVAL;
 wire          mCCD_DVAL_d;
-wire  [15:0]  X_Cont;
-wire  [15:0]  Y_Cont;
-wire  [9:0]   X_ADDR;
-wire  [31:0]  Frame_Cont;
+ wire    [10:0]    X_Cont;
+ wire    [10:0]    Y_Cont;
+ wire    [9:0]    X_ADDR;
+ wire    [31:0]    Frame_Cont;
+ wire    [9:0]    mCCD_R;
+ wire    [9:0]    mCCD_G;
+ wire    [9:0]    mCCD_B;
 wire          DLY_RST_0;
 wire          DLY_RST_1;
 wire          DLY_RST_2;
 wire          Read;
-reg   [11:0]  rCCD_DATA;
+reg   [9:0]  rCCD_DATA;
 reg           rCCD_LVAL;
 reg           rCCD_FVAL;
-wire  [11:0]  sCCD_R;
-wire  [11:0]  sCCD_G;
-wire  [11:0]  sCCD_B;
-wire          sCCD_DVAL;
+//wire  [11:0]  sCCD_R;
+//wire  [11:0]  sCCD_G;
+//wire  [11:0]  sCCD_B;
+//wire          sCCD_DVAL;
 reg   [1:0]   rClk;
 wire          sdram_ctrl_clk;
 
@@ -229,32 +247,31 @@ wire      ltm_sda;
 wire      ltm_scen;
 wire      ltm_3wirebusy_n;
 
-assign  CCD_DATA[0]     = GPIO_1[11];
-assign  CCD_DATA[1]     = GPIO_1[10];
-assign  CCD_DATA[2]     = GPIO_1[9];
-assign  CCD_DATA[3]     = GPIO_1[8];
-assign  CCD_DATA[4]     = GPIO_1[7];
-assign  CCD_DATA[5]     = GPIO_1[6];
-assign  CCD_DATA[6]     = GPIO_1[5];
-assign  CCD_DATA[7]     = GPIO_1[4];
-assign  CCD_DATA[8]     = GPIO_1[3];
-assign  CCD_DATA[9]     = GPIO_1[2];
-assign  CCD_DATA[10]    = GPIO_1[1];
-assign  CCD_DATA[11]    = GPIO_1[0];
-assign  GPIO_CLKOUT_N1  = CCD_MCLK;
-assign  CCD_FVAL        = GPIO_1[18];
-assign  CCD_LVAL        = GPIO_1[17];
-assign  CCD_PIXCLK      = GPIO_CLKIN_N1;
-//assign  GPIO_1[15]      = 1'b1;  // tRIGGER
-//assign  GPIO_1[14]      = DLY_RST_1;
+ assign    CCD_DATA[0]    =    GPIO_1[0];
+ assign    CCD_DATA[1]    =    GPIO_1[1];
+ assign    CCD_DATA[2]    =    GPIO_1[5];
+ assign    CCD_DATA[3]    =    GPIO_1[3];
+ assign    CCD_DATA[4]    =    GPIO_1[2];
+ assign    CCD_DATA[5]    =    GPIO_1[4];
+ assign    CCD_DATA[6]    =    GPIO_1[6];
+ assign    CCD_DATA[7]    =    GPIO_1[7];
+ assign    CCD_DATA[8]    =    GPIO_1[8];
+ assign    CCD_DATA[9]    =    GPIO_1[9];
+ assign    GPIO_1[11]    =    CCD_MCLK;
+ //assign    GPIO_1[15]    =    CCD_SDAT;
+ //assign    GPIO_1[14]    =    CCD_SCLK;
+ assign    CCD_FVAL    =    GPIO_1[13];
+ assign    CCD_LVAL    =    GPIO_1[12];
+ assign    CCD_PIXCLK    =    GPIO_1[10];
 
 assign  oLEDR           = iSW;
 assign  oLEDG           = Y_Cont;
 
 assign  oTD1_RESET_N    = 1'b1;
-assign  oVGA_CLOCK      = ~VGA_CTRL_CLK;
+ assign    VGA_CTRL_CLK=    CCD_MCLK;
+assign  oVGA_CLOCK      = ~CCD_MCLK;
 
-assign  CCD_MCLK        = rClk[0];
+always@(posedge iCLK_50)    CCD_MCLK <= ~CCD_MCLK;
 assign  oUART_TXD       = iUART_RXD;
 
 assign  adc_penirq_n    = GPIO_CLKIN_N0;
@@ -297,8 +314,8 @@ assign  GPIO_0[31]      = ltm_sda;
 assign ltm_grst         = iKEY[0];
 assign adc_ltm_sclk     = ltm_sclk;
 
-always@(posedge iCLK_50)
-  rClk	<=  rClk  + 1;
+/*always@(posedge iCLK_50)
+  rClk	<=  rClk  + 1;*/
 
 always@(posedge CCD_PIXCLK) begin
   rCCD_DATA <=  CCD_DATA;
@@ -314,13 +331,13 @@ end
                              .oCoord_X(mVGA_X),
                              .oCoord_Y(mVGA_Y),
                              //    VGA Side
-                             .oVGA_R(VGA_R),
-                             .oVGA_G(VGA_G),
-                             .oVGA_B(VGA_B),
-                             .oVGA_H_SYNC(VGA_HS),
-                             .oVGA_V_SYNC(VGA_VS),
-                             .oVGA_SYNC(VGA_SYNC),
-                             .oVGA_BLANK(VGA_BLANK),
+                             .oVGA_R(oVGA_R),
+                             .oVGA_G(oVGA_G),
+                             .oVGA_B(oVGA_B),
+                             .oVGA_H_SYNC(oVGA_HS),
+                             .oVGA_V_SYNC(oVGA_VS),
+                             .oVGA_SYNC(oVGA_SYNC),
+                             .oVGA_BLANK(oVGA_BLANK),
                              //    Control Signal
                              .iCLK(VGA_CTRL_CLK),
                              .iRST_N(DLY_RST_2)    );
@@ -333,20 +350,18 @@ Reset_Delay reset0  (
   .oRST_2(DLY_RST_2)
 );
  
- CCD_Capture capture0 (
-  .oDATA(mCCD_DATA),
-  .oDVAL(mCCD_DVAL),
-  .oX_Cont(X_Cont),
-  .oY_Cont(Y_Cont),
-  .oFrame_Cont(Frame_Cont),
-  .iDATA(rCCD_DATA),
-  .iFVAL(rCCD_FVAL),
-  .iLVAL(rCCD_LVAL),
-  .iSTART(!iKEY[3]),
-  .iEND(!iKEY[2]),
-  .iCLK(CCD_PIXCLK),
-  .iRST(DLY_RST_2)
-);
+ CCD_Capture            u3    (    .oDATA(mCCD_DATA),
+                             .oDVAL(mCCD_DVAL),
+                             .oX_Cont(X_Cont),
+                             .oY_Cont(Y_Cont),
+                             .oFrame_Cont(Frame_Cont),
+                             .iDATA(rCCD_DATA),
+                             .iFVAL(rCCD_FVAL),
+                             .iLVAL(rCCD_LVAL),
+                             .iSTART(!iKEY[3]),
+                             .iEND(!iKEY[2]),
+                             .iCLK(CCD_PIXCLK),
+                             .iRST(DLY_RST_1)    );
  
  RAW2RGB                u4    (    .oRed(mCCD_R),
                              .oGreen(mCCD_G),
@@ -368,7 +383,14 @@ Reset_Delay reset0  (
   .oSEG5(oHEX5_D),
   .oSEG6(oHEX6_D),
   .oSEG7(oHEX7_D),
-  .iDIG(Frame_Cont[31:0])
+  .iDIG(Frame_Cont)//Frame_Cont[31:0] -> Frame_Cont
+);
+
+sdram_pll sdram_pll0 (
+  .inclk0(iCLK_50_3),
+  .c0(sdram_ctrl_clk),
+  .c1(oDRAM0_CLK),
+  .c2(oDRAM1_CLK)
 );
  
 Sdram_Control_4Port sdram0 (
@@ -377,7 +399,7 @@ Sdram_Control_4Port sdram0 (
   .RESET_N(1'b1),
   .CLK(sdram_ctrl_clk),
   //  FIFO Write Side 1
-  .WR1_DATA({sCCD_R[11:7], sCCD_G[11:6],  sCCD_B[11:7]}),
+  .WR1_DATA({sCCD_R[9:5], sCCD_G[9:5], sCCD_B[9:5]}),
   .WR1(sCCD_DVAL),
   .WR1_ADDR(0),
   .WR1_MAX_ADDR(800*480),
@@ -385,29 +407,29 @@ Sdram_Control_4Port sdram0 (
   .WR1_LOAD(!DLY_RST_0),
   .WR1_CLK(CCD_PIXCLK),
   //  FIFO Write Side 1
-  .WR2_DATA({sCCD_R[11:7], sCCD_G[11:6],  sCCD_B[11:7]}),
+  /*.WR2_DATA({sCCD_R[9:5], sCCD_G[9:5], sCCD_B[9:5]}),
   .WR2(sCCD_DVAL),
   .WR2_ADDR(22'h100000),
   .WR2_MAX_ADDR(22'h100000 + 800*480),
   .WR2_LENGTH(9'h100),
   .WR2_LOAD(!DLY_RST_0),
-  .WR2_CLK(CCD_PIXCLK),
+  .WR2_CLK(CCD_PIXCLK),*/
   //  FIFO Read Side 1 to LTM
-  .RD1_DATA(Read_DATA3),
+  .RD1_DATA(Read_DATA1),//.RD1_DATA(Read_DATA3) -> .RD1_DATA(Read_DATA1),
   .RD1(Read),
-  .RD1_ADDR(0),
-  .RD1_MAX_ADDR(800*480),
+  .RD1_ADDR(640*16),//0 -> 640*16
+  .RD1_MAX_ADDR(640*496),//800*480 -> 640*496
   .RD1_LENGTH(9'h100),
   .RD1_LOAD(!DLY_RST_0),
-  .RD1_CLK(~ltm_nclk),
+  .RD1_CLK(VGA_CTRL_CLK),//~ltm_nclk -> VGA_CTRL_CLK
   //  FIFO Read Side 1
-  .RD2_DATA(Read_DATA4),
+  .RD2_DATA(Read_DATA2),//.RD1_DATA(Read_DATA4) -> .RD1_DATA(Read_DATA2),
   .RD2(Read),
-  .RD2_ADDR(22'h100000 + 800*480 + 200),
-  .RD2_MAX_ADDR(22'h100000 + 800*480 + 300),
+  .RD2_ADDR(640*512+640*16),//22'h100000 + 800*480 + 200 -> 640*512+640*16
+  .RD2_MAX_ADDR(640*512+640*496),//22'h100000 + 800*480 + 300 -> 640*512+640*496
   .RD2_LENGTH(9'h100),
   .RD2_LOAD(!DLY_RST_0),
-  .RD2_CLK(~ltm_nclk),
+  .RD2_CLK(VGA_CTRL_CLK),//~ltm_nclk -> VGA_CTRL_CLK
   //  SDRAM Side
   .SA(oDRAM0_A[11:0]),
   .BA(oDRAM0_BA),
@@ -419,28 +441,25 @@ Sdram_Control_4Port sdram0 (
   .DQ(DRAM_DQ[15:0]),
   .DQM({oDRAM0_UDQM1,oDRAM0_LDQM0})
 );
-
+/*
 // add by oomusou for RGB16
 assign Read_DATA1 = {Read_DATA3[10:6], Read_DATA3[4:0], 5'h00};
 assign Read_DATA2 = {Read_DATA3[5:5], 4'h0, Read_DATA3[15:11], 5'h00};
- 
-I2C_CCD_Config ccd_config0 (
-  //  Host Side
-  .iCLK(iCLK_50),
-  .iRST_N(DLY_RST_1),
-  .iEXPOSURE_ADJ(iKEY[1]),
-  .iEXPOSURE_DEC_p(iSW[0]),
-  .iMIRROR_SW(iSW[17]),
-  //  I2C Side
-  .I2C_SCLK(GPIO_1[20]),
-  .I2C_SDAT(GPIO_1[19])
-);
+*/
+
+ I2C_CCD_Config         u7    (    //    Host Side
+                             .iCLK(iCLK_50),
+                             .iRST_N(iKEY[1]),
+                             .iExposure(iSW[15:0]),
+                             //    I2C Side
+                             .I2C_SCLK(GPIO_1[14]),
+                             .I2C_SDAT(GPIO_1[15])    );
                              
  I2C_AV_Config         u8    (    //    Host Side
                              .iCLK(iCLK_50),
                              .iRST_N(iKEY[0]),
                              //    I2C Side
-                             .I2C_SCLK(I2C_SCLK),
+                             .I2C_SCLK(oI2C_SCLK),
                              .I2C_SDAT(I2C_SDAT)    );
  
  AUDIO_DAC             u9    (    //    Audio Side
@@ -576,10 +595,10 @@ I2C_CCD_Config ccd_config0 (
  end
  //==================================================================//
  
- /*wire    [9:0]    sCCD_R;
+ wire    [9:0]    sCCD_R;
  wire    [9:0]    sCCD_G;
  wire    [9:0]    sCCD_B;
- wire            sCCD_DVAL;*/
+ wire            sCCD_DVAL;
  
  Mirror_Col u11    (    //    Input Side
    .iCCD_R(mCCD_R),
